@@ -56,7 +56,7 @@ def process_array(data):
         if is_number(item):
             num = int(item)
             if num % 2 == 0:
-                even_numbers.append(item)  # keep as string
+                even_numbers.append(item)
             else:
                 odd_numbers.append(item)
             sum_numbers += num
@@ -66,7 +66,6 @@ def process_array(data):
         elif is_special_character(item):
             special_characters.append(item)
 
-    # Reverse collected alphabets and apply alternating caps
     concat_string = alternating_caps("".join(alpha_chars[::-1]))
 
     return {
