@@ -47,19 +47,6 @@ def test_api():
         
         print("-" * 50)
 
-def test_health():
-    print("Testing Health Endpoint")
-    try:
-        response = requests.get(f"{BASE_URL}/health")
-        if response.status_code == 200:
-            print("Health check passed")
-            print(f"Response: {response.json()}")
-        else:
-            print(f"Health check failed: {response.status_code}")
-    except Exception as e:
-        print(f"Health check error: {str(e)}")
-    print("-" * 50)
-
 def test_root():
     print("Testing Root Endpoint")
     try:
@@ -78,7 +65,6 @@ if __name__ == "__main__":
     print("=" * 50)
     
     test_root()
-    test_health()
     test_api()
     
     print("\nTesting completed!")

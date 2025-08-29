@@ -27,72 +27,62 @@ def generate_user_id(full_name="john_doe"):
     return f"{full_name.lower()}_{date_str}"
 
 def is_number(s):
-    try:
-        float(s)
-        return True
-    except ValueError:
-        return False
+    return re.fullmatch(r"-?\d+", s) is not None
 
 def is_alphabet(s):
-    return bool(re.match(r'^[a-zA-Z]+$', s))
+    return re.fullmatch(r"[a-zA-Z]+", s) is not None
 
 def is_special_character(s):
-    return bool(re.match(r'^[^a-zA-Z0-9\s]+$', s))
+    return re.fullmatch(r"[^a-zA-Z0-9\s]", s) is not None
+
+def alternating_caps(s):
+    """Convert string into alternating caps starting with uppercase."""
+    result = []
+    upper = True
+    for ch in s:
+        if ch.isalpha():
+            result.append(ch.upper() if upper else ch.lower())
+            upper = not upper
+        else:
+            result.append(ch)
+    return "".join(result)
 
 def process_array(data):
-    odd_numbers = []
-    even_numbers = []
-    alphabets = []
-    special_characters = []
+    odd_numbers, even_numbers, alphabets, special_characters = [], [], [], []
     sum_numbers = 0
-    alphabet_chars = []
-    
+    alpha_chars = []
+
     for item in data:
         if is_number(item):
-            num = float(item)
-            if num.is_integer():
-                num_int = int(num)
-                if num_int % 2 == 0:
-                    even_numbers.append(item)
-                else:
-                    odd_numbers.append(item)
-                sum_numbers += num_int
-        elif is_alphabet(item):
+            num = int(item)
+            if num % 2 == 0:
+                even_numbers.append(item)  # keep as string
+            else:
+                odd_numbers.append(item)
+            sum_numbers += num
+        elif item.isalpha():
             alphabets.append(item.upper())
-            alphabet_chars.extend(list(item))
+            alpha_chars.extend(list(item))
         elif is_special_character(item):
             special_characters.append(item)
-    
-    if alphabet_chars:
-        reversed_chars = list(reversed(alphabet_chars))
-        concat_string = ""
-        for i, char in enumerate(reversed_chars):
-            if i % 2 == 0:
-                concat_string += char.upper()
-            else:
-                concat_string += char.lower()
-    else:
-        concat_string = ""
-    
+
+    # Reverse collected alphabets and apply alternating caps
+    concat_string = alternating_caps("".join(alpha_chars[::-1]))
+
     return {
         "odd_numbers": odd_numbers,
         "even_numbers": even_numbers,
         "alphabets": alphabets,
         "special_characters": special_characters,
-        "sum": str(int(sum_numbers)),
-        "concat_string": concat_string
+        "sum": str(sum_numbers),
+        "concat_string": concat_string,
     }
-
-@app.get("/")
-async def root():
-    return {"message": "BFHL API is running! Use POST /bfhl to process arrays."}
 
 @app.post("/bfhl", response_model=ArrayResponse)
 async def process_array_endpoint(request: ArrayRequest):
     try:
         result = process_array(request.data)
-        
-        response = ArrayResponse(
+        return ArrayResponse(
             is_success=True,
             user_id=generate_user_id(),
             email="john@xyz.com",
@@ -102,18 +92,11 @@ async def process_array_endpoint(request: ArrayRequest):
             alphabets=result["alphabets"],
             special_characters=result["special_characters"],
             sum=result["sum"],
-            concat_string=result["concat_string"]
+            concat_string=result["concat_string"],
         )
-        
-        return response
-        
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error processing array: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
-@app.get("/health")
-async def health_check():
-    return {"status": "healthy", "timestamp": datetime.now().isoformat()}
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+@app.get("/")
+async def root():
+    return {"message": "BFHL API running! Use POST /bfhl."}
