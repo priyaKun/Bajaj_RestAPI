@@ -6,7 +6,6 @@ A FastAPI-based REST API that processes arrays and categorizes elements accordin
 
 - **POST /bfhl**: Main endpoint that processes arrays
 - **GET /**: Root endpoint with API information
-- **GET /health**: Health check endpoint
 
 ## API Endpoint
 
@@ -46,41 +45,6 @@ A FastAPI-based REST API that processes arrays and categorizes elements accordin
 3. **Special Characters**: Identified and separated
 4. **Concatenation**: All alphabets in reverse order with alternating caps
 5. **User ID**: Generated in format `fullname_ddmmyyyy`
-
-## Local Development
-
-### Prerequisites
-
-- Python 3.8+
-- pip
-
-### Installation
-
-1. Clone the repository:
-```bash
-git clone <your-repo-url>
-cd <repo-name>
-```
-
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-3. Run the application:
-```bash
-python main.py
-```
-
-Or using uvicorn directly:
-```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-
-4. Access the API:
-   - API: http://localhost:8000
-   - Documentation: http://localhost:8000/docs
-   - Health Check: http://localhost:8000/health
 
 ## Testing
 
